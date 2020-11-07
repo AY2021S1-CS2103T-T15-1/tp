@@ -32,7 +32,7 @@ import seedu.address.model.person.hairdresser.Hairdresser;
 import seedu.address.model.person.hairdresser.HairdresserId;
 import seedu.address.testutil.HairdresserBuilder;
 
-public class AddHairdresserTest {
+public class AddHairdresserCommandTest {
 
     @Test
     public void constructor_nullHairdresser_throwsNullPointerException() {

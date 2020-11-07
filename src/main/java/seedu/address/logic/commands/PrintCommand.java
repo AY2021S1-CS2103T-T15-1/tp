@@ -6,7 +6,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import javafx.collections.ObservableList;
+import seedu.address.commons.util.FileUtil;
 import seedu.address.model.Model;
 import seedu.address.model.appointment.Appointment;
 import seedu.address.model.person.client.Client;
@@ -58,17 +58,17 @@ public class PrintCommand extends Command {
         appointmentList = model.getHairStyleX().getAppointmentList();
 
         Callable<Void> writeAppt = () -> {
-            writeToCsv(ExportType.appointment);
+            writeToCsv(ExportType.appointment, model);
             return null;
         };
 
         Callable<Void> writeClient = () -> {
-            writeToCsv(ExportType.client);
+            writeToCsv(ExportType.client, model);
             return null;
         };
 
         Callable<Void> writeHairdresser = () -> {
-            writeToCsv(ExportType.hairdresser);
+            writeToCsv(ExportType.hairdresser, model);
             return null;
         };
 
@@ -90,7 +90,7 @@ public class PrintCommand extends Command {
         return new CommandResult(MESSAGE_SUCCESS);
     }
 
-    private void writeToCsv(ExportType type) {
+    private void writeToCsv(ExportType type, Model model) {
         String fileName;
         switch (type) {
         case hairdresser:
@@ -106,9 +106,10 @@ public class PrintCommand extends Command {
             throw new IllegalArgumentException();
         }
 
-        Path csvFilePath = Paths.get("data" , fileName + ".csv");
+        Path csvFilePath = model.getUserPrefs().getCsvFilePath().resolve(fileName + ".csv");
 
         try {
+            FileUtil.createIfMissing(csvFilePath);
             BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath.toString()));
             appendToWriter(writer, type);
         } catch (IOException ex) {

@@ -14,28 +14,24 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_SPECIALISATION;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_START_TIME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TITLE;
+import static seedu.address.testutil.Assert.assertThrows;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.logic.commands.hairdresser.EditHairdresserCommand;
+import seedu.address.model.HairStyleX;
 import seedu.address.model.Model;
-
-//import static seedu.address.testutil.Assert.assertThrows;
-//
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.List;
-//
-//import seedu.address.commons.core.index.Index;
-//import seedu.address.logic.commands.exceptions.CommandException;
-//import seedu.address.model.AddressBook;
-//import seedu.address.model.Model;
-//import seedu.address.model.person.NameContainsKeywordsPredicate;
-//import seedu.address.model.person.Person;
-//import seedu.address.testutil.EditPersonDescriptorBuilder;
+import seedu.address.model.appointment.Appointment;
+import seedu.address.model.person.client.Client;
+import seedu.address.model.person.hairdresser.Hairdresser;
+import seedu.address.model.person.hairdresser.HairdresserId;
+import seedu.address.model.person.hairdresser.HairdresserNameContainsKeywordsPredicate;
+import seedu.address.testutil.EditHairdresserDescriptorBuilder;
 
 /**
  * Contains helper methods for testing commands.
@@ -76,6 +72,19 @@ public class CommandTestUtil {
     public static final String INVALID_GENDER_DESC = " " + PREFIX_GENDER + "G"; // non-'F'/'M' not allowed for gender
     public static final String INVALID_SPECIALISATION_DESC = " " + PREFIX_SPECIALISATION + "hubby*";
     // '*' not allowed in specs
+
+    public static final EditHairdresserCommand.EditHairdresserDescriptor DESC_ALISSA;
+    public static final EditHairdresserCommand.EditHairdresserDescriptor DESC_BENJAMIN;
+
+    static {
+        DESC_ALISSA = new EditHairdresserDescriptorBuilder().withName(VALID_NAME_ALISSA)
+                .withPhone(VALID_PHONE_ALISSA).withEmail(VALID_EMAIL_ALISSA).withGender(VALID_GENDER_ALISSA)
+                .withTitle(VALID_TITLE_ALISSA).withSpecs(VALID_SPECIALISATION_COLOR).build();
+        DESC_BENJAMIN = new EditHairdresserDescriptorBuilder().withName(VALID_NAME_BENJAMIN)
+                .withPhone(VALID_PHONE_BENJAMIN).withEmail(VALID_EMAIL_BENJAMIN).withGender(VALID_GENDER_BENJAMIN)
+                .withTitle(VALID_TITLE_BENJAMIN)
+                .withSpecs(VALID_SPECIALISATION_COLOR, VALID_SPECIALISATION_PERM).build();
+    }
 
     //for client testings
 
@@ -137,19 +146,7 @@ public class CommandTestUtil {
     public static final String DESC_INVALID_MARK_APPT_INDEX = " " + INVALID_MARK_APPT_INDEX + " " + DESC_VALID_STATUS;
     public static final String DESC_INVALID_MARK_APPT_STATUS = " " + VALID_MARK_APPT_INDEX + " " + DESC_INVALID_STATUS;
 
-    //
-    //public static final EditCommand.EditPersonDescriptor DESC_AMY;
-    //public static final EditCommand.EditPersonDescriptor DESC_BOB;
-    //
-    //static {
-    //    DESC_AMY = new EditPersonDescriptorBuilder().withName(VALID_NAME_AMY)
-    //            .withPhone(VALID_PHONE_AMY).withEmail(VALID_EMAIL_AMY).withAddress(VALID_ADDRESS_AMY)
-    //            .withTags(VALID_TAG_FRIEND).build();
-    //    DESC_BOB = new EditPersonDescriptorBuilder().withName(VALID_NAME_BOB)
-    //            .withPhone(VALID_PHONE_BOB).withEmail(VALID_EMAIL_BOB).withAddress(VALID_ADDRESS_BOB)
-    //            .withTags(VALID_TAG_HUSBAND, VALID_TAG_FRIEND).build();
-    //}
-    //
+
     /**
      * Executes the given {@code command}, confirms that <br>
      * - the returned {@link CommandResult} matches {@code expectedCommandResult} <br>
@@ -176,22 +173,40 @@ public class CommandTestUtil {
         assertCommandSuccess(command, actualModel, expectedCommandResult, expectedModel);
     }
     //
-    ///**
-    // * Executes the given {@code command}, confirms that <br>
-    // * - a {@code CommandException} is thrown <br>
-    // * - the CommandException message matches {@code expectedMessage} <br>
-    // * - the address book, filtered person list and selected person in {@code actualModel} remain unchanged
-    // */
-    //public static void assertCommandFailure(Command command, Model actualModel, String expectedMessage) {
-    //    // we are unable to defensively copy the model for comparison later, so we can
-    //    // only do so by copying its components.
-    //    AddressBook expectedAddressBook = new AddressBook(actualModel.getAddressBook());
-    //    List<Person> expectedFilteredList = new ArrayList<>(actualModel.getFilteredPersonList());
-    //
-    //    assertThrows(CommandException.class, expectedMessage, () -> command.execute(actualModel));
-    //    assertEquals(expectedAddressBook, actualModel.getAddressBook());
-    //    assertEquals(expectedFilteredList, actualModel.getFilteredPersonList());
-    //}
+    /**
+     * Executes the given {@code command}, confirms that <br>
+     * - a {@code CommandException} is thrown <br>
+     * - the CommandException message matches {@code expectedMessage} <br>
+     * - HairStyleX, filtered list and selected items in {@code actualModel} remain unchanged
+     */
+    public static void assertCommandFailure(Command command, Model actualModel, String expectedMessage) {
+        // we are unable to defensively copy the model for comparison later, so we can
+        // only do so by copying its components.
+        HairStyleX expectedHairStyleX = new HairStyleX(actualModel.getHairStyleX());
+        List<Hairdresser> expectedFilteredHairdresserList = new ArrayList<>(actualModel.getFilteredHairdresserList());
+        List<Client> expectedFilteredClientList = new ArrayList<>(actualModel.getFilteredClientList());
+        List<Appointment> expectedFilteredApptList = new ArrayList<>(actualModel.getFilteredAppointmentList());
+
+        assertThrows(CommandException.class, expectedMessage, () -> command.execute(actualModel));
+        assertEquals(expectedHairStyleX, actualModel.getHairStyleX());
+        assertEquals(expectedFilteredHairdresserList, actualModel.getFilteredHairdresserList());
+        assertEquals(expectedFilteredClientList, actualModel.getFilteredClientList());
+        assertEquals(expectedFilteredApptList, actualModel.getFilteredAppointmentList());
+    }
+
+    /**
+     * Updates {@code model}'s filtered list to show only the hairdresser at the given {@code targetIndex} in the
+     * {@code model}'s address book.
+     */
+    public static void showHairdresserAtIndex(Model model, HairdresserId targetIndex) {
+
+        Hairdresser hairdresser = model.getFilteredHairdresserList().get(targetIndex.id - 1);
+        final String[] splitName = hairdresser.getName().fullName.split("\\s+");
+        model.updateFilteredHairdresserList(new HairdresserNameContainsKeywordsPredicate(Arrays.asList(splitName[0])));
+
+        assertEquals(1, model.getFilteredHairdresserList().size());
+    }
+
     ///**
     // * Updates {@code model}'s filtered list to show only the person at the given {@code targetIndex} in the
     // * {@code model}'s address book.

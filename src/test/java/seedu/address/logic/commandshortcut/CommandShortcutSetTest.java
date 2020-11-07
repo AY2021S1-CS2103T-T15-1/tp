@@ -10,8 +10,6 @@ import seedu.address.logic.commandshortcut.exceptions.CommandWordException;
 
 class CommandShortcutSetTest {
 
-
-
     @Test
     void insertNewShortcut() {
         CommandShortcutSet.reset();
@@ -27,7 +25,6 @@ class CommandShortcutSetTest {
 
 
     }
-
 
     @Test
     void getCommandWord() {

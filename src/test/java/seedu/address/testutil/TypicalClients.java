@@ -86,6 +86,7 @@ public class TypicalClients {
     //public static final Client AMY = new ClientBuilder().withName(VALID_NAME_AMY)
     //    .withPhone(VALID_PHONE_AMY)
     //    .withEmail(VALID_EMAIL_AMY)
+    //    .withGender(VALID_GENDER_AMY)
     //    .withAddress(VALID_ADDRESS_AMY)
     //    .withTags(VALID_TAG_FRIEND)
     //    .build();

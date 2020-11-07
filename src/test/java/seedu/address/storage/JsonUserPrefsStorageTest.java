@@ -73,7 +73,8 @@ public class JsonUserPrefsStorageTest {
     private UserPrefs getTypicalUserPrefs() {
         UserPrefs userPrefs = new UserPrefs();
         userPrefs.setGuiSettings(new GuiSettings(1000, 500, 300, 100));
-        userPrefs.setHairStyleXFilePath(Paths.get("hairstylex.json"));
+        userPrefs.setHairStyleXFilePath(Paths.get("data", "hairstylex.json"));
+        userPrefs.setCsvFilePath(Paths.get("data"));
         return userPrefs;
     }
 
